@@ -1,172 +1,167 @@
 # Student-performane-analysis_Task5
 Data analysis using python- internship task 5
-# 📊 Student Performance Analysis
+# 🚢 Titanic ML Pipeline
 
-A complete **Exploratory Data Analysis (EDA)** project on student performance data using Python.  
-This project analyzes various academic and social factors affecting student scores through data cleaning, preprocessing, visualization, and statistical analysis.
+**Data Science with Python Internship | Maincrafts Technology — Task 5**
 
-Developed as part of an internship task at **Main Crafts Technology**.
-
----
-
-## 🚀 Project Objective
-
-The main objective of this project is to:
-
-- Understand student performance patterns
-- Perform data cleaning and preprocessing
-- Analyze relationships between different variables
-- Create meaningful visualizations
-- Generate insights from the dataset
+A complete, professional machine learning pipeline built on the classic Titanic dataset. The project demonstrates a real-world ML workflow: data cleaning, preprocessing, model training, evaluation, and persistence.
 
 ---
 
-## 📂 Dataset Description
+## 📋 Objective
 
-The dataset includes information about students such as:
+Build an end-to-end supervised ML pipeline that:
 
-- Gender
-- Parental education
-- Lunch type
-- Test preparation course
-- Math score
-- Reading score
-- Writing score
-
----
-
-## 🛠️ Technologies Used
-
-| Technology | Purpose |
-|------------|---------|
-| Python | Programming Language |
-| Pandas | Data Manipulation |
-| NumPy | Numerical Operations |
-| Matplotlib | Data Visualization |
-| Seaborn | Statistical Visualization |
-| Jupyter Notebook | Development Environment |
-
----
-
-## 📋 Project Workflow
-
-### 1️⃣ Data Collection
-- Imported dataset using Pandas
-
-### 2️⃣ Data Cleaning
-- Checked missing values
-- Removed unnecessary data
-- Fixed data inconsistencies
-
-### 3️⃣ Exploratory Data Analysis
-- Statistical summary
-- Correlation analysis
-- Feature relationships
-
-### 4️⃣ Data Visualization
-Created various visualizations including:
-
-- Histogram
-- Bar Chart
-- Boxplot
-- Scatter Plot
-- Heatmap
-
-### 5️⃣ Insights Generation
-- Identified performance trends
-- Compared student categories
-- Analyzed score relationships
-
----
-
-## 📊 Sample Insights
-
-- Students completing test preparation courses scored better.
-- Reading and writing scores show strong positive correlation.
-- Parental education impacts student performance.
-- Female students performed better in reading and writing.
+- Cleans and preprocesses raw data (missing value imputation, categorical encoding, numeric scaling)
+- Trains a **Logistic Regression** classifier as an interpretable baseline
+- Evaluates performance using accuracy, precision/recall/F1, confusion matrix, and ROC-AUC
+- Validates results with **5-fold cross-validation** for reliable generalisation estimates
+- Persists the trained pipeline to `model.joblib` for reuse
 
 ---
 
 ## 📁 Project Structure
 
-```bash
-Student-performane-analysis_Task4/
-│
-├── data/
-│   └── students.csv
-│
-├── Student_Performance_Analysis.ipynb
-├── README.md
-└── requirements.txt
+```
+.
+├── internship_task5.ipynb   # Main notebook with full pipeline
+├── Titanic-Dataset.csv      # Dataset (891 passengers, 12 columns)
+├── model.joblib             # Saved trained pipeline (generated on run)
+└── images/
+    ├── confusion_matrix.png
+    ├── roc_curve.png
+    ├── cross_validation.png
+    └── feature_importance.png
 ```
 
 ---
 
-## ▶️ How to Run the Project
+## 🗂️ Dataset
 
-### Step 1: Clone Repository
+The standard Kaggle Titanic dataset with **891 rows and 12 columns**.
 
-```bash
-git clone https://github.com/rahulab01/Student-performane-analysis_Task4.git
+**Target variable:** `Survived` (0 = did not survive, 1 = survived)
+
+### Features Used
+
+| Feature | Type | Rationale |
+|---|---|---|
+| `Pclass` | Categorical | Proxy for socioeconomic status and cabin deck proximity to lifeboats |
+| `Sex` | Categorical | The single most predictive feature — "women and children first" |
+| `Age` | Numeric | Children were prioritised; ~20% missing (median imputed) |
+| `SibSp` | Numeric | Number of siblings/spouses aboard |
+| `Parch` | Numeric | Number of parents/children aboard |
+| `Fare` | Numeric | Correlated with class and cabin location |
+| `Embarked` | Categorical | Port of embarkation: S = Southampton, C = Cherbourg, Q = Queenstown |
+
+**Excluded:** `PassengerId`, `Name`, `Ticket`, `Cabin` (77% missing)
+
+### Missing Value Strategy
+
+| Column | Missing | Strategy |
+|---|---|---|
+| `Age` | ~20% (177 rows) | Median imputation (robust to outliers, fitted on train only) |
+| `Cabin` | ~77% (687 rows) | Dropped entirely |
+| `Embarked` | 2 rows | Most frequent value ('S') |
+
+---
+
+## ⚙️ Pipeline Architecture
+
+Built using a `sklearn.pipeline.Pipeline` wrapping a `ColumnTransformer` to prevent data leakage — all preprocessing statistics are fitted only on training data.
+
+```
+Pipeline
+├── Preprocessor (ColumnTransformer)
+│   ├── Numeric Pipeline  → SimpleImputer(median) → StandardScaler
+│   └── Categorical Pipeline → SimpleImputer(most_frequent) → OneHotEncoder
+└── Classifier → LogisticRegression(max_iter=1000)
 ```
 
-### Step 2: Open Project Folder
+**Train/Test Split:** 80/20, stratified on the target (`random_state=42`)
+
+---
+
+## 📊 Results
+
+| Metric | Value |
+|---|---|
+| Test Accuracy | ~80.8% |
+| Test ROC-AUC | ~0.860 |
+| CV ROC-AUC (5-fold) | ~0.858 ± 0.022 |
+| CV Accuracy (5-fold) | ~0.800 ± 0.025 |
+
+Low standard deviation across folds confirms the model is stable and generalises well.
+
+---
+
+## 🔑 Key Findings
+
+1. **Sex is the strongest predictor** — female survival rate ~74% vs ~19% for males.
+2. **Pclass is the second most impactful feature** — 1st-class passengers had deck and evacuation priority; 3rd-class survival rate was only ~24%.
+3. **Fare adds marginal signal** beyond Pclass (correlated with cabin location).
+4. **Age has a moderate effect** — children were prioritised; the 20% missingness limits its signal.
+5. **The sklearn Pipeline eliminates data leakage** — the professional standard for reproducible ML.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 ```bash
-cd Student-performane-analysis_Task4
+pip install pandas numpy matplotlib seaborn scikit-learn joblib
 ```
 
-### Step 3: Install Required Libraries
+### Running the Notebook
 
 ```bash
-pip install pandas numpy matplotlib seaborn
+jupyter notebook internship_task5.ipynb
 ```
 
-### Step 4: Run Jupyter Notebook
+Ensure `Titanic-Dataset.csv` is in the same directory as the notebook before running.
 
-```bash
-jupyter notebook
+### Loading the Saved Model
+
+```python
+import joblib
+import pandas as pd
+
+model = joblib.load('model.joblib')
+
+sample = pd.DataFrame([{
+    'Pclass': '1', 'Sex': 'female', 'Age': 29,
+    'SibSp': 0, 'Parch': 0, 'Fare': 100.0, 'Embarked': 'S'
+}])
+
+print(model.predict(sample))          # [1]
+print(model.predict_proba(sample))    # [[prob_0, prob_1]]
 ```
 
 ---
 
-## 📸 Visualizations Included
+## 🔭 Recommended Next Steps
 
-✔ Histogram  
-✔ Bar Chart  
-✔ Boxplot  
-✔ Scatter Plot  
-✔ Correlation Heatmap  
-
----
-
-## 🎯 Learning Outcomes
-
-This project helped improve my skills in:
-
-- Data Cleaning
-- Exploratory Data Analysis
-- Data Visualization
-- Feature Engineering
-- Statistical Analysis
-- Insight Extraction
+- **Feature engineering:** `FamilySize = SibSp + Parch`, `IsAlone` flag, title extraction from `Name` (Mr, Mrs, Miss, Master)
+- **Advanced models:** Compare with Random Forest and Gradient Boosting
+- **Hyperparameter tuning:** Optimise regularisation `C` with `GridSearchCV`
+- **Class imbalance:** Try `class_weight='balanced'` to improve recall on survivors
+- **Cabin:** Extract deck letter from the ~200 non-null `Cabin` rows
 
 ---
 
-## 🔗 GitHub Repository
+## 🛠️ Tech Stack
 
-[Student Performance Analysis Repository](https://github.com/rahulab01/Student-performane-analysis_Task4?utm_source=chatgpt.com)
+- **Python 3.x**
+- **pandas / numpy** — data manipulation
+- **scikit-learn** — ML pipeline, modelling, evaluation
+- **matplotlib / seaborn** — visualisation
+- **joblib** — model serialisation
 
 ---
 
-## 👨‍💻 Author
+## 📜 License
 
+This project was developed as part of the Maincrafts Technology Data Science Internship (Task 5).
+## Author
 Rahul Prajapat
-
-- 
-
----
-
-
----
